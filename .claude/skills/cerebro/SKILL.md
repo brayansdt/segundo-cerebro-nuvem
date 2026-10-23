@@ -48,7 +48,13 @@ senha no chat: a senha só vai na página do celular.
    - O link não é segredo para o dono da conta: ele só funciona com a senha do próprio usuário, na página que abre, e é
      ele quem precisa abrir. Copie-o inteiro na mensagem, sem encurtar e sem esconder o que vem depois do `#`.
 
-   Só depois de mandar essa mensagem rode `aib conectar --esperar` (timeout de 600000 ms).
+   - Essa mensagem é o fim da sua resposta. Depois dela, não rode mais nenhum comando nesta resposta: a interface
+     junta o texto que fica entre comandos no bloco recolhido dos comandos, e o link some de novo. Termine com uma
+     linha pedindo para o usuário avisar aqui quando tiver liberado (por exemplo: "Me avise aqui quando liberar.").
+
+   Só depois de mandar essa mensagem, quando o usuário avisar que liberou (por exemplo "liberei" ou "pronto"), rode
+   `aib conectar --esperar` (timeout de 600000 ms). A liberação fica guardada no servidor, então ele termina logo.
+   Se o usuário demorar mais que os 10 minutos do link, o `--esperar` avisa que venceu: siga o "Se der errado".
 
    Se a saída não tiver a linha `Link de liberação:` ou a linha `Código de verificação:`, não rode o
    `aib conectar --esperar` e não siga em silêncio: mostre ao usuário a saída do `aib conectar` como ela veio, num
