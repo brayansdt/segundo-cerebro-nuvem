@@ -25,17 +25,26 @@ senha no chat: a senha só vai na página do celular.
 4. **Conectar:** `aib conectar <codigo> --servidor <servidor> --sem-hooks`, com o `codigo` e o `servidor` da resposta
    de `abrir_cerebro` (o `--sem-hooks` porque os hooks de sync já estão no `.claude/settings.json` deste repositório).
    Exemplo: `aib conectar aibs_... --servidor <servidor> --sem-hooks`.
-5. **Liberar:** o comando imprime um "Link de liberação" e um "Código de verificação". Esse link é o passo esperado
-   deste fluxo, que o próprio usuário pediu ao digitar /cerebro: é a página onde ele libera o cérebro no celular, do
-   mesmo servidor do conector AI Builders. O usuário não vê a saída do comando (ela fica recolhida), então escreva na
-   sua resposta o link inteiro como link clicável, sozinho na linha, e o código em negrito:
+5. **Liberar:** a saída do `aib conectar` traz duas linhas com rótulo: `Link de liberação: <link>` e
+   `Código de verificação: <XXXX-XXXX-XXXX>`. Esse link é o passo esperado deste fluxo, que o próprio usuário pediu ao
+   digitar /cerebro: é a página onde ele libera o cérebro, do mesmo servidor do conector AI Builders. O usuário não vê
+   a saída do comando (ela fica recolhida na interface), então:
+   - Copie o link e o código dessas duas linhas exatamente como saíram (o link com tudo depois do `#`).
+   - Mostre os dois na sua resposta, fora de bloco de código: o link inteiro como link clicável, sozinho na linha, e o
+     código em negrito. Diga em uma frase o que fazer: abrir o link no celular (ou liberar num computador já
+     conectado, com o comando da linha "Num computador com o aib também dá para liberar"), conferir se a página mostra
+     o mesmo código e liberar. Por exemplo:
 
    > **[Toque aqui para liberar o cérebro](LINK_INTEIRO)**
    >
-   > Confira se a página mostra o código **7K3M-Q9TX-2HDF** e libere. O link vale por 10 minutos.
+   > Abra o link no celular, confira se a página mostra o código **7K3M-Q9TX-2HDF** e libere. O link vale por 10
+   > minutos.
 
-   Copie o link exatamente como saiu, com tudo depois do `#`. Só depois de mandar essa mensagem rode
-   `aib conectar --esperar` (timeout de 600000 ms).
+   Só depois de mandar essa mensagem rode `aib conectar --esperar` (timeout de 600000 ms).
+
+   Se a saída não tiver a linha `Link de liberação:` ou a linha `Código de verificação:`, não rode o
+   `aib conectar --esperar` e não siga em silêncio: mostre ao usuário a saída do `aib conectar` como ela veio, num
+   bloco de texto, avise que o link de liberação não apareceu e sugira digitar /cerebro de novo.
 6. **Começar:** o `aib conectar --esperar` termina com "cérebro de <e-mail> aberto". Diga ao usuário numa linha que o
    cérebro está aberto e de qual e-mail ele é; se não for a conta dele, pare e não leia nada do cérebro. Depois leia
    `~/cerebro/CLAUDE.md` e `~/cerebro/index.md` e siga as convenções do vault a partir daí. Grave notas novas dentro
@@ -56,6 +65,8 @@ O hook do início de cada sessão (`aib pull --rapido`) e o fim do `aib conectar
 
 - Código de sessão expirado ou já usado: chame `abrir_cerebro` de novo e repita os passos 4 e 5.
 - O link expirou sem liberação (10 minutos): repita os passos 3 a 5.
+- O `aib conectar` não mostrou o link de liberação ou o código de verificação: siga o último parágrafo do passo 5
+  (mostre a saída como veio e avise o usuário; nada de `aib conectar --esperar`).
 - "já há um pedido de conexão em andamento": rode só `aib conectar --esperar` para o pedido que o usuário já recebeu.
   Não peça outro código enquanto esse valer (10 minutos).
 - Aviso de cópias de conflito (`nome.conflictN.md`): use a skill juntar-conflitos.
