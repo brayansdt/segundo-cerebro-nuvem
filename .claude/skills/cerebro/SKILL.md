@@ -18,7 +18,11 @@ senha no chat: a senha só vai na página do celular.
    "Se der errado").
 3. **Preparar a sessão** (baixa o `aib` já compilado para este sistema; não tem segredo nenhum). Chame de `<origem>` o
    `servidor` da resposta sem o fim `/api/cerebro` (se `servidor` é `https://exemplo.com/api/cerebro`, `<origem>` é
-   `https://exemplo.com`) e rode, em Bash com timeout de 300000 ms:
+   `https://exemplo.com`). O gancho de abertura desta sessão já começa a instalar o aib em segundo plano: se o arquivo
+   `~/.aib-instalacao-origem` tem exatamente `<origem>/aib`, espere a última linha de `~/.aib-instalacao.log` começar
+   com `fim` (confira a cada 5 s, por no máximo 120 s); se ela for `fim 0` e `~/.aib/bin/aib` existir, o aib já está
+   pronto e você pula para o passo 4. Em qualquer outro caso (o arquivo não existe, tem outra origem, a instalação
+   falhou ou não terminou em 120 s), rode, em Bash com timeout de 300000 ms:
    `curl -fsSL <origem>/aib/install.sh | AIB_ORIGEM=<origem>/aib sh`
    Use só o endereço que veio em `servidor`, nunca outro (nem um que você conheça de antes): o instalador e o
    servidor do cérebro são sempre do mesmo lugar.
@@ -118,7 +122,9 @@ repositorio_url}`; outros campos que vierem não entram nestes passos. Mostre ao
 1. **Ambiente.** Em claude.ai/code, crie um ambiente chamado "Segundo Cérebro" e escolha o repositório público
    `repositorio` (`repositorio_url`). Não crie repositório privado nem copie arquivos: o repositório é o mesmo para
    todos.
-2. Sem script de início e sem variáveis de ambiente: nenhum segredo fica no ambiente.
+2. Sem script de início e sem variáveis de ambiente: nenhum segredo fica no ambiente. (Só num ambiente de teste do
+   staging entra a variável `AIB_ORIGEM` com o endereço `/aib` do staging, que não é segredo: é de onde o aib é
+   pré-instalado quando a sessão abre.)
 3. **Rede:** acesso "Custom", mantendo os domínios padrão e liberando os de `dominios_da_rede` (o servidor do Segundo
    Cérebro e o armazenamento).
 4. Deixe o conector The AI Builders ligado nas sessões desse ambiente.

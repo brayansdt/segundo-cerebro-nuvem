@@ -17,7 +17,9 @@ ou Cowork, num Mac ou num Linux), com o conector The AI Builders ligado, e peça
 ## Como usar (uma vez)
 
 1. Em claude.ai/code, crie um ambiente chamado "Segundo Cérebro" com este repositório (`brayansdt/segundo-cerebro-nuvem`).
-2. Sem script de início e sem variáveis de ambiente: nenhum segredo fica no ambiente.
+2. Sem script de início e sem variáveis de ambiente: nenhum segredo fica no ambiente. (Só num ambiente de teste do
+   staging entra a variável `AIB_ORIGEM` com o endereço `/aib` do staging, que não é segredo: é de onde o aib é
+   pré-instalado quando a sessão abre.)
 3. Rede: acesso "Custom", mantendo os domínios padrão e liberando os do servidor do Segundo Cérebro e do armazenamento.
    No computador, peça ao Claude "configura o meu segundo cérebro no Claude na nuvem": ele mostra a lista certa.
 4. Deixe o conector The AI Builders ligado nas sessões desse ambiente.
