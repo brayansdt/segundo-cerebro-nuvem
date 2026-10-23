@@ -1,0 +1,16 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(aib pull*)", "Bash(aib push*)", "Bash(aib sync*)", "Bash(aib onde*)", "Bash(aib conectar*)",
+      "Bash(aib conflitos*)", "Bash(aib restaurar*)"
+    ]
+  },
+  "hooks": {
+    "SessionStart": [
+      { "hooks": [{ "type": "command", "command": "if [ \"$CLAUDE_CODE_REMOTE\" = true ] && command -v aib >/dev/null; then aib pull --rapido; fi" }] }
+    ],
+    "Stop": [
+      { "hooks": [{ "type": "command", "command": "if [ \"$CLAUDE_CODE_REMOTE\" = true ] && command -v aib >/dev/null; then aib push --rapido; fi" }] }
+    ]
+  }
+}
