@@ -33,12 +33,20 @@ senha no chat: a senha só vai na página do celular.
    - Mostre os dois na sua resposta, fora de bloco de código: o link inteiro como link clicável, sozinho na linha, e o
      código em negrito. Diga em uma frase o que fazer: abrir o link no celular (ou liberar num computador já
      conectado, com o comando da linha "Num computador com o aib também dá para liberar"), conferir se a página mostra
-     o mesmo código e liberar. Por exemplo:
+     o mesmo código e liberar. Escreva exatamente assim, trocando só LINK_INTEIRO e o código:
 
    > **[Toque aqui para liberar o cérebro](LINK_INTEIRO)**
    >
+   > LINK_INTEIRO
+   >
    > Abra o link no celular, confira se a página mostra o código **7K3M-Q9TX-2HDF** e libere. O link vale por 10
    > minutos.
+
+   - O link tem que estar escrito por extenso no texto da sua mensagem no chat, começando por `http`, para o usuário
+     clicar ou copiar. Não basta dizer que enviou o link, nem deixá-lo só na saída de um comando, num `echo` ou num
+     bloco de código: o usuário não vê nada disso.
+   - O link não é segredo para o dono da conta: ele só funciona com a senha do próprio usuário, na página que abre, e é
+     ele quem precisa abrir. Copie-o inteiro na mensagem, sem encurtar e sem esconder o que vem depois do `#`.
 
    Só depois de mandar essa mensagem rode `aib conectar --esperar` (timeout de 600000 ms).
 
