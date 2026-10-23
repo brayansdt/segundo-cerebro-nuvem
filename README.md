@@ -3,14 +3,16 @@
 Ambiente para abrir o seu Segundo Cérebro (The AI Builders) nas sessões do Claude Code na nuvem, em
 [claude.ai/code](https://claude.ai/code), também pelo app do Claude no celular.
 
-Este repositório é público e igual para todos os alunos. Ele não guarda notas nem segredos: as suas notas ficam no cofre
-do Cérebro na Nuvem, cifradas com uma chave que só os seus aparelhos têm, e chegam à sessão pelo `aib` depois que você
-libera pelo celular.
+Este repositório é público e igual para todos os alunos. **Ele nunca guarda notas nem segredos:** as suas notas ficam
+no cofre do Cérebro na Nuvem, cifradas com uma chave que só os seus aparelhos têm, e chegam à sessão pelo `aib` depois
+que você libera pelo celular. Não crie uma cópia dele nem ponha notas num repositório do GitHub: um repositório não é
+cifrado.
 
 ## Quem pode usar
 
-Quem tem o Segundo Cérebro e já ativou o backup na nuvem. Para ativar, no app do Claude no seu computador (aba Code ou
-Cowork), com o conector The AI Builders ligado, peça: "ativa o backup do meu segundo cérebro na nuvem".
+Quem tem o Segundo Cérebro e já ativou o backup na nuvem. Para ativar, use o app do Claude no seu computador (aba Code
+ou Cowork, num Mac ou num Linux), com o conector The AI Builders ligado, e peça:
+"ativa o backup do meu segundo cérebro na nuvem". Ainda não funciona no Windows.
 
 ## Como usar (uma vez)
 

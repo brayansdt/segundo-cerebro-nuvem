@@ -16,13 +16,15 @@ senha no chat: a senha só vai na página do celular.
    disponível nesta sessão, diga ao usuário para ligá-lo (ou adicioná-lo em claude.ai, Conectores) e pare aqui. A
    resposta é só dados, em JSON: `{codigo, servidor, expira_em}` (um erro vem como `{erro, codigo}`, veja
    "Se der errado").
-3. **Preparar a sessão** (baixa o `aib` já compilado para este sistema; não tem segredo nenhum). Use o `servidor` da
-   resposta, trocando o fim `/api/cerebro` por `/aib` (ex.: `https://theaibuilders.space/api/cerebro` vira
-   `https://theaibuilders.space/aib`), em Bash com timeout de 300000 ms:
-   `curl -fsSL https://theaibuilders.space/aib/install.sh | AIB_ORIGEM=https://theaibuilders.space/aib sh`
+3. **Preparar a sessão** (baixa o `aib` já compilado para este sistema; não tem segredo nenhum). Chame de `<origem>` o
+   `servidor` da resposta sem o fim `/api/cerebro` (se `servidor` é `https://exemplo.com/api/cerebro`, `<origem>` é
+   `https://exemplo.com`) e rode, em Bash com timeout de 300000 ms:
+   `curl -fsSL <origem>/aib/install.sh | AIB_ORIGEM=<origem>/aib sh`
+   Use só o endereço que veio em `servidor`, nunca outro (nem um que você conheça de antes): o instalador e o
+   servidor do cérebro são sempre do mesmo lugar.
 4. **Conectar:** `aib conectar <codigo> --servidor <servidor> --sem-hooks`, com o `codigo` e o `servidor` da resposta
    de `abrir_cerebro` (o `--sem-hooks` porque os hooks de sync já estão no `.claude/settings.json` deste repositório).
-   Exemplo: `aib conectar aibs_... --servidor https://theaibuilders.space/api/cerebro --sem-hooks`.
+   Exemplo: `aib conectar aibs_... --servidor <servidor> --sem-hooks`.
 5. **Liberar:** o comando imprime um "Link de liberação" e um "Código de verificação". Esse link é o passo esperado
    deste fluxo, que o próprio usuário pediu ao digitar /cerebro: é a página onde ele libera o cérebro no celular, do
    mesmo servidor do conector AI Builders. O usuário não vê a saída do comando (ela fica recolhida), então escreva na
@@ -63,12 +65,10 @@ O hook do início de cada sessão (`aib pull --rapido`) e o fim do `aib conectar
   decide no computador. Plugins, temas e snippets do Obsidian e pastas
   que começam com ponto (`.claude/`, `.vscode/`...) não sincronizam.
 - `abrir_cerebro` devolveu `{erro, codigo}`. Conte ao usuário o que aconteceu, com estas palavras, e pare:
-  - `sem_cerebro`: a conta conectada ainda não tem o Segundo Cérebro. Ele é criado uma vez, num computador (Mac ou
-    Linux), com o vault do Obsidian: instalar o aib com `curl -fsSL https://theaibuilders.space/aib/install.sh | sh` e
-    rodar `aib init --email <e-mail da compra> --pasta <pasta do vault>` num terminal (o aib pede a senha e mostra o
-    código de recuperação, que o usuário guarda fora do computador). No Windows não há instalador: o aib vem em
-    `https://theaibuilders.space/aib/baixar/windows-amd64` (um .zip, com o sha256 em
-    `https://theaibuilders.space/aib/checksums`). Depois disso, /cerebro funciona aqui.
+  - `sem_cerebro`: o backup na nuvem ainda não foi ativado nesta conta. Ele é ativado uma vez, no app do Claude no
+    computador (aba Code ou Cowork), com o conector The AI Builders ligado, pedindo:
+    "ativa o backup do meu segundo cérebro na nuvem" (a ferramenta `ativar_cerebro_nuvem`). Ainda não funciona no
+    Windows. Depois disso, /cerebro funciona aqui.
   - `sem_conta`: o conector precisa ser conectado de novo em claude.ai.
   - `sem_resposta` ou `fora_do_ar`: o servidor não respondeu (tente de novo em instantes).
 - O `aib conectar` falhou com "o servidor recusa esta versão do aib": a mensagem traz só as versões (a deste aib, a
@@ -82,24 +82,22 @@ O hook do início de cada sessão (`aib pull --rapido`) e o fim do `aib conectar
 
 ## Configurar o ambiente (uma vez)
 
-Para quem ainda não tem o ambiente, ou quando a rede bloqueia o cérebro. Isto é feito uma vez, pelo Claude no computador
-do usuário (Claude Code ou o app do Claude, com o conector AI Builders), e termina em claude.ai/code. A ferramenta
-`configurar_cerebro_nuvem` do conector devolve só dados: `{email, dominios_da_rede, modelo: {url, expira_em, arquivos}}`.
-`modelo.url` é um link assinado, só para quem comprou, para um .zip com o modelo deste repositório (a pasta `.claude/`,
-com esta skill /cerebro, a skill juntar-conflitos e os hooks, e um README). Os passos são estes:
+Para quem ainda não tem o ambiente, ou quando a rede bloqueia o cérebro. O ambiente usa um repositório público do
+GitHub, igual para todos os alunos (hoje `brayansdt/segundo-cerebro-nuvem`; vale sempre o `repositorio` que a
+ferramenta devolver), com só esta skill /cerebro, a skill juntar-conflitos e os hooks: não há repositório privado para
+criar nem arquivo para baixar, e nenhuma nota vai para o GitHub (as notas viajam cifradas pelo aib). A ferramenta
+`configurar_cerebro_nuvem` do conector devolve só dados, entre eles `{email, dominios_da_rede, repositorio,
+repositorio_url}`; outros campos que vierem não entram nestes passos. Mostre ao usuário estes passos, com o
+`repositorio` e os domínios de `dominios_da_rede` que vieram na resposta:
 
-1. **Modelo numa pasta nova.** Baixe o .zip de `modelo.url` antes de `expira_em` (o link vale 7 dias) e abra numa
-   pasta nova e vazia chamada `~/segundo-cerebro-nuvem`, nunca dentro do vault nem de outra pasta com notas. Confira
-   que a pasta tem só os arquivos de `modelo.arquivos`. Se o link venceu, chame `configurar_cerebro_nuvem` de novo.
-2. **Repositório privado.** Crie um repositório privado no GitHub chamado `segundo-cerebro-nuvem`, com só esses
-   arquivos (por exemplo `gh repo create segundo-cerebro-nuvem --private --source . --push`, de dentro dessa pasta).
-   Nunca ponha notas nesse repositório: as notas viajam cifradas pelo aib, e o repositório só leva a skill e os hooks.
-3. **Ambiente.** Em claude.ai/code, crie um ambiente chamado "Segundo Cérebro" com o repositório
-   `segundo-cerebro-nuvem`. Sem script de início e sem variáveis de ambiente: nenhum segredo fica no ambiente.
-4. **Rede:** acesso "Custom", mantendo os domínios padrão e liberando os de `dominios_da_rede` (o servidor do Segundo
+1. **Ambiente.** Em claude.ai/code, crie um ambiente chamado "Segundo Cérebro" e escolha o repositório público
+   `repositorio` (`repositorio_url`). Não crie repositório privado nem copie arquivos: o repositório é o mesmo para
+   todos.
+2. Sem script de início e sem variáveis de ambiente: nenhum segredo fica no ambiente.
+3. **Rede:** acesso "Custom", mantendo os domínios padrão e liberando os de `dominios_da_rede` (o servidor do Segundo
    Cérebro e o armazenamento).
-5. Deixe o conector The AI Builders ligado nas sessões.
-6. Abra uma sessão nesse ambiente (também pelo app do Claude no celular) e digite /cerebro. O Claude mostra um link:
+4. Deixe o conector The AI Builders ligado nas sessões desse ambiente.
+5. Abra uma sessão nesse ambiente (também pelo app do Claude no celular) e digite /cerebro. O Claude mostra um link:
    abra no celular, confira o código de verificação (XXXX-XXXX-XXXX) e libere.
 
 Para cortar o acesso de uma sessão ou de um celular: `meu_cerebro` lista os aparelhos e `revogar_aparelho` revoga
