@@ -10,9 +10,9 @@ cifrado.
 
 ## Quem pode usar
 
-Quem tem o Segundo Cérebro e já ativou o backup na nuvem. Para ativar, use o app do Claude no seu computador (aba Code
-ou Cowork, num Mac ou num Linux), com o conector The AI Builders ligado, e peça:
-"ativa o backup do meu segundo cérebro na nuvem". Ainda não funciona no Windows.
+Quem tem um pacote do AIOS-cloud e já ativou o backup na nuvem. Para ativar, use o app do Claude no seu computador
+(aba Code ou Cowork, num Mac, num Linux ou num Windows), com o conector The AI Builders ligado, e peça:
+"ativa o backup do meu segundo cérebro na nuvem".
 
 ## Como usar (uma vez)
 
