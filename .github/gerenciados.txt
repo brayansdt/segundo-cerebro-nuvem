@@ -1,0 +1,8 @@
+# Arquivos e pastas que a Action "Atualizar do Segundo Cérebro" copia deste repositório
+# para a cópia de cada aluno, uma vez por semana. Um caminho por linha.
+# Uma pasta é copiada inteira e fica igual à daqui (o que sumiu aqui some lá).
+# Nunca liste nada em .github/workflows: o token da Action não pode mudar esses arquivos.
+.claude/VERSAO
+.claude/settings.json
+.claude/skills/cerebro
+.claude/skills/juntar-conflitos

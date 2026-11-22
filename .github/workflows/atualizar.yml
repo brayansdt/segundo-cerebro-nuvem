@@ -1,0 +1,79 @@
+# Mantém a cópia do aluno igual ao repositório público brayansdt/segundo-cerebro-nuvem.
+# Roda toda segunda-feira e também pelo botão "Run workflow" na aba Actions.
+# Copia só os caminhos listados em .github/gerenciados.txt do repositório público.
+# Este arquivo não se atualiza sozinho (o token da Action não pode mudar .github/workflows):
+# ele precisa nascer certo e não mudar mais.
+name: Atualizar do Segundo Cérebro
+
+on:
+  schedule:
+    - cron: "23 4 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: atualizar-segundo-cerebro
+  cancel-in-progress: false
+
+jobs:
+  atualizar:
+    if: github.repository != 'brayansdt/segundo-cerebro-nuvem'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Abrir a cópia do aluno
+        uses: actions/checkout@v4
+
+      - name: Baixar o repositório público
+        run: git clone --depth 1 --quiet https://github.com/brayansdt/segundo-cerebro-nuvem.git "$RUNNER_TEMP/origem"
+
+      - name: Copiar os arquivos gerenciados
+        run: |
+          set -euo pipefail
+          origem="$RUNNER_TEMP/origem"
+          lista="$origem/.github/gerenciados.txt"
+          if [ ! -f "$lista" ]; then
+            echo "O repositório público não tem .github/gerenciados.txt; nada a fazer."
+            exit 0
+          fi
+          : > "$RUNNER_TEMP/caminhos"
+          while IFS= read -r caminho || [ -n "$caminho" ]; do
+            caminho="${caminho%%#*}"
+            caminho="$(printf '%s' "$caminho" | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')"
+            [ -z "$caminho" ] && continue
+            case "$caminho" in
+              .|./*|/*|*..*|.git|.git/*|.github|.github/workflows|.github/workflows/*)
+                echo "::warning::Caminho recusado: $caminho"
+                continue ;;
+            esac
+            if [ -d "$origem/$caminho" ]; then
+              mkdir -p "$caminho"
+              rsync -a --delete "$origem/$caminho/" "$caminho/"
+            elif [ -f "$origem/$caminho" ]; then
+              mkdir -p "$(dirname "$caminho")"
+              cp "$origem/$caminho" "$caminho"
+            else
+              rm -rf "$caminho"
+            fi
+            printf '%s\n' "$caminho" >> "$RUNNER_TEMP/caminhos"
+          done < "$lista"
+
+      - name: Gravar a atualização
+        run: |
+          set -euo pipefail
+          versao="$(git -C "$RUNNER_TEMP/origem" rev-parse --short HEAD)"
+          while IFS= read -r caminho; do
+            git add -A -- "$caminho"
+          done < "$RUNNER_TEMP/caminhos"
+          if git diff --cached --quiet; then
+            echo "Já está na versão mais nova ($versao)."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit --quiet -m "Atualiza do segundo-cerebro-nuvem ($versao)"
+          git push --quiet
+          echo "Atualizado para $versao:"
+          git show --stat --format= HEAD
