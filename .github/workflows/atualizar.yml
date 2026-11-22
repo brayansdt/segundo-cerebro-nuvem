@@ -24,7 +24,7 @@ jobs:
     timeout-minutes: 5
     steps:
       - name: Abrir a cópia do aluno
-        uses: actions/checkout@v5
+        uses: actions/checkout@v7
 
       - name: Baixar o repositório público
         run: git clone --depth 1 --quiet https://github.com/brayansdt/segundo-cerebro-nuvem.git "$RUNNER_TEMP/origem"
