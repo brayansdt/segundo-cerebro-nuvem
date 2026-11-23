@@ -1,6 +1,7 @@
 {
   "permissions": {
     "allow": [
+      "Bash(aib --version*)",
       "Bash(aib pull*)",
       "Bash(aib push*)",
       "Bash(aib sync*)",
@@ -16,15 +17,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "if [ \"$CLAUDE_CODE_REMOTE\" = true ] && command -v aib >/dev/null; then aib pull --rapido; fi"
-          }
-        ]
-      },
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "if [ \"$CLAUDE_CODE_REMOTE\" = true ] && [ ! -x \"$HOME/.aib/bin/aib\" ]; then o=\"${AIB_ORIGEM:-https://theaibuilderssociety.com/aib}\"; printf %s \"$o\" > \"$HOME/.aib-instalacao-origem\"; (curl -fsSL \"$o/install.sh\" | AIB_ORIGEM=\"$o\" sh > \"$HOME/.aib-instalacao.log\" 2>&1; echo \"fim $?\" >> \"$HOME/.aib-instalacao.log\") > /dev/null 2>&1 & fi"
+            "command": "if [ \"$CLAUDE_CODE_REMOTE\" = true ] && [ -f \"${CLAUDE_PROJECT_DIR:-.}/.aib/instalar.sh\" ]; then sh \"${CLAUDE_PROJECT_DIR:-.}/.aib/instalar.sh\"; fi"
           }
         ]
       }

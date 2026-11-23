@@ -1,0 +1,64 @@
+# Põe neste repositório o aib publicado no servidor (só Linux x86_64, o da nuvem).
+# Rode pelo botão "Run workflow" quando a versão mínima aceita pelo servidor subir.
+# Depois disso, a Action "Atualizar do Segundo Cérebro" leva o aib novo à cópia de cada aluno.
+# Só roda no repositório público; nas cópias dos alunos ela não faz nada.
+name: Publicar aib
+
+on:
+  workflow_dispatch:
+    inputs:
+      origem:
+        description: "De onde vem o aib (sem barra no fim)"
+        default: "https://theaibuilderssociety.com/aib"
+        required: true
+
+permissions:
+  contents: write
+
+concurrency:
+  group: publicar-aib
+  cancel-in-progress: false
+
+jobs:
+  publicar:
+    if: github.repository == 'brayansdt/segundo-cerebro-nuvem'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Baixar e conferir o aib
+        env:
+          ORIGEM: ${{ inputs.origem }}
+        run: |
+          set -euo pipefail
+          case "$ORIGEM" in https://*) ;; *) echo "::error::A origem precisa começar com https://"; exit 1 ;; esac
+          curl -fsSL "$ORIGEM/checksums" -o "$RUNNER_TEMP/checksums"
+          curl -fsSL "$ORIGEM/baixar/linux-amd64" -o "$RUNNER_TEMP/aib-linux-amd64.gz"
+          esperado="$(awk '$2 == "aib-linux-amd64.gz" { print $1 }' "$RUNNER_TEMP/checksums")"
+          obtido="$(sha256sum "$RUNNER_TEMP/aib-linux-amd64.gz" | cut -d' ' -f1)"
+          if [ -z "$esperado" ] || [ "$esperado" != "$obtido" ]; then
+            echo "::error::O aib baixado não confere com o checksums publicado; nada foi publicado."
+            exit 1
+          fi
+          mkdir -p .aib
+          cp "$RUNNER_TEMP/aib-linux-amd64.gz" .aib/aib-linux-amd64.gz
+          { head -1 "$RUNNER_TEMP/checksums"; grep ' aib-linux-amd64.gz$' "$RUNNER_TEMP/checksums"; } > .aib/checksums
+          gunzip -c .aib/aib-linux-amd64.gz > "$RUNNER_TEMP/aib" && chmod +x "$RUNNER_TEMP/aib"
+          echo "VERSAO_AIB=$("$RUNNER_TEMP/aib" --version | awk '{print $NF}')" >> "$GITHUB_ENV"
+
+      - name: Gravar
+        run: |
+          set -euo pipefail
+          git add .aib/aib-linux-amd64.gz .aib/checksums
+          if git diff --cached --quiet; then
+            echo "O repositório já tem o aib $VERSAO_AIB."
+            exit 0
+          fi
+          printf '%s\n' "$(date -u +%Y-%m-%d)-aib-$VERSAO_AIB" > .claude/VERSAO
+          git add .claude/VERSAO
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit --quiet -m "Publica o aib $VERSAO_AIB (Linux x86_64)"
+          git push --quiet
+          echo "Publicado o aib $VERSAO_AIB."

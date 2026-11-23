@@ -6,3 +6,4 @@
 .claude/settings.json
 .claude/skills/cerebro
 .claude/skills/juntar-conflitos
+.aib

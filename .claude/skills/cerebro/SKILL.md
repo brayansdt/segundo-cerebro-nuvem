@@ -16,16 +16,10 @@ senha no chat: a senha só vai na página do celular.
    disponível nesta sessão, diga ao usuário para ligá-lo (ou adicioná-lo em claude.ai, Conectores) e pare aqui. A
    resposta é só dados, em JSON: `{codigo, servidor, expira_em}` (um erro vem como `{erro, codigo}`, veja
    "Se der errado").
-3. **Preparar a sessão** (baixa o `aib` já compilado para este sistema; não tem segredo nenhum). Chame de `<origem>` o
-   `servidor` da resposta sem o fim `/api/cerebro` (se `servidor` é `https://exemplo.com/api/cerebro`, `<origem>` é
-   `https://exemplo.com`). O gancho de abertura desta sessão já começa a instalar o aib em segundo plano: se o arquivo
-   `~/.aib-instalacao-origem` tem exatamente `<origem>/aib`, espere a última linha de `~/.aib-instalacao.log` começar
-   com `fim` (confira a cada 5 s, por no máximo 120 s); se ela for `fim 0` e `~/.aib/bin/aib` existir, o aib já está
-   pronto e você pula para o passo 4. Em qualquer outro caso (o arquivo não existe, tem outra origem, a instalação
-   falhou ou não terminou em 120 s), rode, em Bash com timeout de 300000 ms:
-   `curl -fsSL <origem>/aib/install.sh | AIB_ORIGEM=<origem>/aib sh`
-   Use só o endereço que veio em `servidor`, nunca outro (nem um que você conheça de antes): o instalador e o
-   servidor do cérebro são sempre do mesmo lugar.
+3. **Conferir o aib.** O `aib` vem pronto dentro deste repositório (pasta `.aib`) e o gancho de abertura da sessão já o
+   instalou, sem baixar nada. Confira com `aib --version`. Se responder, siga para o passo 4. Se não responder, leia
+   `~/.aib-instalacao.log`, conte ao usuário em uma linha o que ele diz e pare. Nunca baixe nem instale o aib você
+   mesmo: nada de `curl`, `wget` ou `install.sh` nesta sessão.
 4. **Conectar:** `aib conectar <codigo> --servidor <servidor> --sem-hooks`, com o `codigo` e o `servidor` da resposta
    de `abrir_cerebro` (o `--sem-hooks` porque os hooks de sync já estão no `.claude/settings.json` deste repositório).
    Exemplo: `aib conectar aibs_... --servidor <servidor> --sem-hooks`.
@@ -109,11 +103,12 @@ O hook do início de cada sessão (`aib pull --rapido`) e o fim do `aib conectar
   - `sem_conta`: o conector precisa ser conectado de novo em claude.ai.
   - `sem_resposta` ou `fora_do_ar`: o servidor não respondeu (tente de novo em instantes).
 - O `aib conectar` falhou com "o servidor recusa esta versão do aib": a mensagem traz só as versões (a deste aib, a
-  mínima aceita e a atual) e a linha "atualização: pelo instalador do produto". Rode de novo o `curl` do passo 3 (ele
-  instala a versão publicada) e repita os passos 4 e 5.
-- A recusa diz "nenhuma versão aceita está publicada ainda": reinstalar traria a mesma versão recusada. Conte ao
-  usuário que o servidor ainda não publicou uma versão do aib que ele aceite e pare; mais tarde, /cerebro de novo.
-- O `curl` do passo 3 ou o `aib conectar` falham por rede (host bloqueado, `403` do proxy, `no such host`): a rede do
+  mínima aceita e a atual). O aib desta sessão vem do repositório, e a versão nova chega sozinha pela atualização
+  automática (a Action "Atualizar do Segundo Cérebro", toda semana). Conte isso ao usuário com as versões da mensagem,
+  diga que ele pode adiantar rodando essa Action na aba Actions do repositório no GitHub, e pare. Não instale nada.
+- A recusa diz "nenhuma versão aceita está publicada ainda": conte ao usuário que o servidor ainda não publicou uma
+  versão do aib que ele aceite e pare; mais tarde, /cerebro de novo.
+- O `aib conectar` falha por rede (host bloqueado, `403` do proxy, `no such host`): a rede do
   ambiente não libera o servidor ou o armazenamento. Chame `configurar_cerebro_nuvem` e mostre ao usuário os passos de
   "Configurar o ambiente" abaixo, com os domínios de `dominios_da_rede`.
 
