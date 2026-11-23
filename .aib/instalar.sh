@@ -7,13 +7,25 @@ set -eu
 
 pasta="$(cd "$(dirname "$0")" && pwd)"
 log="$HOME/.aib-instalacao.log"
-printf '%s\n' "repositorio" > "$HOME/.aib-instalacao-origem"
 
 falhar() {
   echo "Cérebro na Nuvem: $1" >&2
   echo "fim 1 $1" >> "$log"
   exit 0
 }
+
+# Ambiente de teste (staging): a variável AIB_ORIGEM do ambiente aponta para outro servidor, e o aib deste
+# repositório (o de produção) seria recusado por ele. Nesse caso o gancho baixa o aib dessa origem, como antes.
+if [ -n "${AIB_ORIGEM:-}" ]; then
+  case "$AIB_ORIGEM" in https://*) ;; *) falhar "AIB_ORIGEM precisa começar com https://" ;; esac
+  printf '%s\n' "$AIB_ORIGEM" > "$HOME/.aib-instalacao-origem"
+  curl -fsSL "$AIB_ORIGEM/install.sh" | AIB_ORIGEM="$AIB_ORIGEM" sh > "$log" 2>&1 || falhar "a instalação de $AIB_ORIGEM falhou"
+  echo "fim 0" >> "$log"
+  if [ -f "$HOME/cerebro/CLAUDE.md" ]; then "$HOME/.aib/bin/aib" pull --rapido || true; fi
+  exit 0
+fi
+
+printf '%s\n' "repositorio" > "$HOME/.aib-instalacao-origem"
 
 case "$(uname -s)" in Linux) os=linux ;; *) falhar "sistema não suportado: $(uname -s)" ;; esac
 case "$(uname -m)" in
